@@ -1,7 +1,9 @@
+
 import allure
 import pytest
 import requests
 from django.middleware.csrf import _get_new_csrf_string
+
 
 class ApiClient:
     def __init__(self, base_address):
@@ -21,9 +23,29 @@ class ApiClient:
 
 @pytest.fixture
 def test_main():
-    return ApiClient(base_address='http://127.0.0.1:8000/')
+    return ApiClient(base_address='http://127.0.0.1:8080/')
 
 
-# @pytest.fixture
-# def get_db(db):
-#     return db
+def _get_token(test_main):
+    response = test_main.get('login', headers={'Cookie': f'csrftoken={test_main.csrftoken}'})
+    index_start = response.text.find('csrfmiddlewaretoken')
+    index_start = response.text.find('value', index_start)
+    index_start = response.text.find('"', index_start) + 1
+    index_end = response.text.find('"', index_start)
+    return response.text[index_start:index_end]
+
+
+@pytest.fixture
+def get_token(test_main):
+    return _get_token(test_main)
+
+
+@pytest.fixture
+def login_data(test_main):
+    csrfmiddlewaretoken = test_main.csrftoken
+    acc_data = {
+        'username': "admin",
+        'password': "admin",
+        'csrfmiddlewaretoken': csrfmiddlewaretoken
+    }
+    return acc_data
