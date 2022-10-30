@@ -23,7 +23,7 @@ class ApiClient:
 
 @pytest.fixture
 def test_main():
-    return ApiClient(base_address='http://127.0.0.1:8080/')
+    return ApiClient(base_address='http://127.0.0.1:8000/')
 
 
 def _get_token(test_main):
